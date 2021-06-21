@@ -20,6 +20,10 @@ public class ProductRepository {
         productMap.put(product.getId(), product);
     }
 
+    public Product findById(long id){
+        return productMap.get(id);
+    }
+
     public void delete(long id){
         productMap.remove(id);
     }
