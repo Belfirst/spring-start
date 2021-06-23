@@ -21,7 +21,8 @@ public class FirstServlet implements Servlet{
 
     @Override
     public void service(ServletRequest servletRequest, ServletResponse servletResponse) throws ServletException, IOException {
-        servletResponse.getWriter().println("<h1>Hello from servlet!!!</h1>");
+        servletResponse.getWriter().println("<h1>Something went wrong!!!</h1>");
+        servletResponse.getWriter().println("<p>Check the number entered in the request</p>");
     }
 
     @Override
