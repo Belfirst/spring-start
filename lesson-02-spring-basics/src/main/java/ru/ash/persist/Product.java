@@ -1,17 +1,9 @@
 package ru.ash.persist;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
-@Component
 public class Product {
     private Long id;
     private String title;
     private int cost;
-
-    @Autowired
-    public Product(){
-    }
 
     public Product(Long id, String title, int cost) {
         this.id = id;
@@ -41,5 +33,14 @@ public class Product {
 
     public void setCost(int cost) {
         this.cost = cost;
+    }
+
+    @Override
+    public String toString() {
+        return "Product{" +
+                "id=" + id +
+                ", title='" + title + '\'' +
+                ", cost=" + cost +
+                '}';
     }
 }
