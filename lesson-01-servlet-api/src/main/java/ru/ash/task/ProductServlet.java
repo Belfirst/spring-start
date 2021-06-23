@@ -2,6 +2,7 @@ package ru.ash.task;
 
 import ru.ash.task.persist.Product;
 import ru.ash.task.persist.ProductRepository;
+import ru.ash.task.persist.ProductRepositoryImp;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -15,15 +16,15 @@ import java.util.List;
 @WebServlet(urlPatterns = "/products/*")
 public class ProductServlet extends HttpServlet {
 
-    private ProductRepository productRepository;
+    private ProductRepository productRepositoryImp;
 
     @Override
     public void init() throws ServletException{
-       productRepository = (ProductRepository) getServletContext().getAttribute("productRepository");
+       productRepositoryImp = (ProductRepositoryImp) getServletContext().getAttribute("productRepository");
     }
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        List<Product> products = productRepository.findAll();
+        List<Product> products = productRepositoryImp.findAll();
         PrintWriter pw = resp.getWriter();
 
         if(req.getPathInfo() == null){
