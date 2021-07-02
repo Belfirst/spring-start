@@ -16,6 +16,6 @@
         <property name="format_sql">true</property>
         <property name="hbm2ddl.auto">update</property>
 
-        <mapping class="ru.ash.entity.User"/>
+        <mapping class="ru.ash.persist.Product"/>
     </session-factory>
 </hibernate-configuration>

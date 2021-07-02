@@ -5,7 +5,6 @@ import ru.ash.entity.User;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
-import java.util.List;
 
 public class Main {
     public static void main(String[] args) {
@@ -70,7 +69,7 @@ public class Main {
         em.getTransaction().begin();
 
         // 1 способ
-//        em.createQuery("update User set age = 22 where id = 1").executeUpdate();
+//        em.createQuery("delete User where id = 1").executeUpdate();
 
         //2 способ
 //        User user = em.find(User.class, 7L);

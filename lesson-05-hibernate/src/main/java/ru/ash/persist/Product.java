@@ -1,21 +1,29 @@
 package ru.ash.persist;
 
-import javax.validation.constraints.Min;
-import javax.validation.constraints.NotBlank;
+import javax.persistence.*;
 
-
+@Entity
+@Table(name = "Products")
 public class Product {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @NotBlank
+    @Column(nullable = false)
     private String title;
-    @Min(value = 0)
+    @Column(nullable = false)
     private int cost;
 
     public Product(){
     }
 
-    public Product(Long id, String title, int cost) {
+    public Product( String title, Integer cost) {
+        this.id = null;
+        this.title = title;
+        this.cost = cost;
+    }
+
+    public Product(Long id, String title, Integer cost) {
         this.id = id;
         this.title = title;
         this.cost = cost;
