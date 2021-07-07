@@ -1,5 +1,7 @@
 package ru.ash.persist;
 
+import ru.ash.entity.User;
+
 import javax.persistence.*;
 
 @Entity
@@ -13,14 +15,18 @@ public class Product {
     private String title;
     @Column(nullable = false)
     private int cost;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name= "user_id")
+    private User user;
 
     public Product(){
     }
 
-    public Product( String title, Integer cost) {
+    public Product( String title, Integer cost, User user) {
         this.id = null;
         this.title = title;
         this.cost = cost;
+        this.user = user;
     }
 
     public Product(Long id, String title, Integer cost) {
@@ -51,6 +57,14 @@ public class Product {
 
     public void setCost(int cost) {
         this.cost = cost;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
     }
 
     @Override

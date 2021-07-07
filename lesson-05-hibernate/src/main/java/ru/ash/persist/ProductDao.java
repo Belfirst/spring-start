@@ -1,51 +1,74 @@
 package ru.ash.persist;
 
-import org.hibernate.cfg.Configuration;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+import ru.ash.MyEntityManagerFactory;
+import ru.ash.entity.User;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import java.util.List;
-import java.util.Optional;
+import java.util.function.Consumer;
+import java.util.function.Function;
+
+@Component
 public class ProductDao {
 
-     EntityManagerFactory entityManagerFactory = new Configuration().
-        configure("hibernate.cfg.xml").buildSessionFactory();
+     private final EntityManagerFactory entityManagerFactory;
 
-    public Optional<Product> findById(long id){
-        EntityManager em = entityManagerFactory.createEntityManager();
-        Product product = em.find(Product.class,id);
-        em.close();
-        return Optional.ofNullable(product);
+     @Autowired
+     public ProductDao(MyEntityManagerFactory entityManagerFactory){
+         this.entityManagerFactory = entityManagerFactory.getEntityManagerFactory();
+     }
+
+    public Product findById(long id){
+        return executeForEntityManager(em -> em.find(Product.class,id));
     }
 
     public List<Product> findAll() {
-        EntityManager em = entityManagerFactory.createEntityManager();
-        List<Product> select_u_from_product_u = em.createQuery("select u from Product u", Product.class).getResultList();
-        em.close();
-        return select_u_from_product_u;
+        return executeForEntityManager(em ->em.createQuery("select u from Product u", Product.class)
+                .getResultList());
     }
 
     public void saveOrUpdate(Product product){
-        EntityManager em = entityManagerFactory.createEntityManager();
-        em.getTransaction().begin();
-        em.merge(product);
-        em.getTransaction().commit();
-        em.close();
+        executeInTransaction(em -> em.merge(product));
     }
 
     public void insert(Product product) {
-        EntityManager em = entityManagerFactory.createEntityManager();
-        em.getTransaction().begin();
-        em.persist(product);
-        em.getTransaction().commit();
-        em.close();
+        executeInTransaction(em -> em.persist(product));
     }
 
     public void delete(long id){
+        executeInTransaction(em -> em.createQuery("delete from Product where id = :id")
+                .setParameter("id",id).executeUpdate());
+    }
+
+    private <R> R executeForEntityManager(Function<EntityManager, R> function ){
+         EntityManager em = entityManagerFactory.createEntityManager();
+         try{
+             return function.apply(em);
+         } finally {
+             em.close();
+         }
+    }
+
+    private void executeInTransaction(Consumer<EntityManager> consumer){
         EntityManager em = entityManagerFactory.createEntityManager();
-        em.getTransaction().begin();
-        em.createQuery("delete from Product where id = :id").setParameter("id",id).executeUpdate();
-        em.getTransaction().commit();
-        em.close();
+        try{
+            em.getTransaction().begin();
+            consumer.accept(em);
+            em.getTransaction().commit();
+        } catch (Exception e){
+            em.getTransaction().rollback();
+        } finally {
+            em.close();
+        }
+    }
+    
+    public Product getProductById(Long id){
+        EntityManager em = entityManagerFactory.createEntityManager();
+        return em.createQuery("SELECT c from Product c join fetch c.user where c.id = :id", Product.class)
+                .setParameter("id", id)
+                .getSingleResult();
     }
 }
