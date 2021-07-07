@@ -44,13 +44,16 @@
                 <tr>
                     <th scope="col">Id</th>
                     <th scope="col">Title</th>
+                    <th scope="col">Cost</th>
                     <th scope="col">Actions</th>
                 </tr>
                 </thead>
                 <tbody>
                 <tr th:each="product : ${products}">
                     <th scope="row" th:text="${product.id}">1</th>
-                    <td th:text="${product.title}">Alex</td>
+                    <td th:text="${product.title}">Title</td>
+                    <td th:text="${product.cost}">Cost</td>
+
                     <td>
                         <a class="btn btn-success" th:href="@{/product/{id}(id = ${product.id})}"><i class="fas fa-edit"></i></a>
                         <a class="btn btn-danger" th:href="@{/product/{id}/delete(id = ${product.id})}"><i class="far fa-trash-alt"></i></a>
