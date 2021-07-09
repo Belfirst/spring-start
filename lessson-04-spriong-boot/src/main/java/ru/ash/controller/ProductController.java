@@ -13,6 +13,7 @@ import ru.ash.persist.Product;
 import ru.ash.persist.ProductRepository;
 
 import javax.validation.Valid;
+import java.util.List;
 import java.util.Optional;
 
 @Controller
@@ -29,9 +30,21 @@ public class ProductController {
     }
 
     @GetMapping
-    public String listPage(Model model){
+    public String listPage(Model model,
+                           @RequestParam("costMin") Optional<Integer> costMin,
+                           @RequestParam("costMax") Optional<Integer> costMax){
         logger.info("Product list page");
-        model.addAttribute("products", productRepository.findAll());
+        List<Product> products;
+        if (costMax.isPresent() && costMin.isPresent())
+            products = productRepository.findProductsByCostAfterAndCostBefore(costMin.get(),costMax.get());
+        else if(costMax.isPresent())
+            products = productRepository.findProductsByCostBefore(costMax.get());
+        else if(costMin.isPresent())
+            products = productRepository.findProductsByCostAfter(costMin.get());
+        else {
+            products = productRepository.findAll();
+        }
+        model.addAttribute("products", products);
         return "products";
     }
 
@@ -53,7 +66,7 @@ public class ProductController {
     @GetMapping("/{id}/delete")
     public String delete(@PathVariable("id") Long id){
         logger.info("Edit product");
-        productRepository.delete(id);
+        productRepository.deleteById(id);
         return "redirect:/product";
     }
 

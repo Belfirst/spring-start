@@ -38,6 +38,34 @@
             <a class="btn btn-primary" th:href="@{/product/new}">Add Product</a>
         </div>
 
+<!--        <div class="col - 12 mt-3">-->
+<!--            <form class="form-inline" th:method="get">-->
+<!--                <div class="form-group mb-2 mr-2">-->
+<!--                    <label for="productFilter" class="sr-only">Product filer</label>-->
+<!--                    <input type="text" class="form-control" id="productFilter"-->
+<!--                        name="productFilter" placeholder="Product filter">-->
+<!--                    <label for="costMin" class="sr-only">Min</label>-->
+<!--                    <input type="number" class="form-control" id="costMin"-->
+<!--                           name="costMin" placeholder="Price min">-->
+<!--                </div>-->
+<!--                <button type="submit" class="btn btn-primary mb-2">Apply</button>-->
+<!--            </form>-->
+<!--        </div>-->
+
+        <div class="col - 12 mt-3">
+            <form class="form-inline" th:method="get">
+                <div class="form-group mb-2 mr-2">
+                    <label for="costMin" class="sr-only">Min</label>
+                    <input type="number" class="form-control" id="costMin"
+                           name="costMin" placeholder="Price min">
+                    <label for="costMax" class="sr-only">Max</label>
+                    <input type="number" class="form-control" id="costMax"
+                           name="costMax" placeholder="Price max">
+                </div>
+                <button type="submit" class="btn btn-primary mb-2">Apply</button>
+            </form>
+        </div>
+
         <div class="col-12">
             <table class="table table-bordered my-2">
                 <thead>
