@@ -1,0 +1,9 @@
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+    <a class="page-link" th:fragment="pagination (page, label)" th:href="@{/product(page=${page},
+                                size=${products.size},
+                                productFilter=${param.productFilter},
+                                minCost=${param.minCost},
+                                maxCost=${param.maxCost},
+                                sortBy=${param.sortBy},
+                                sortDir = ${param.sortDir})}" tabindex="-1">[[${label}]]</a>
+</html>

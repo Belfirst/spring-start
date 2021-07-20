@@ -3,9 +3,6 @@ package ru.ash.controller;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -13,12 +10,9 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 import ru.ash.persist.Product;
-import ru.ash.persist.ProductRepository;
-import ru.ash.persist.ProductSpecifications;
+import ru.ash.service.ProductService;
 
 import javax.validation.Valid;
-import java.util.List;
-import java.util.Optional;
 
 @Controller
 @RequestMapping("/product")
@@ -26,11 +20,11 @@ public class ProductController {
 
     private static final Logger logger = LoggerFactory.getLogger(ProductController.class);
 
-    private final ProductRepository productRepository;
+    private final ProductService productService;
 
     @Autowired
-    public ProductController(ProductRepository productRepository) {
-        this.productRepository = productRepository;
+    public ProductController(ProductService productService) {
+        this.productService = productService;
     }
 
     // Способ с использованием методов spring date
@@ -54,29 +48,42 @@ public class ProductController {
 //    }
 
         // способ с использование критерий
+//    @GetMapping
+//    public String listPage(Model model,
+//                           @RequestParam("productFilter") Optional<String> productFilter,
+//                           @RequestParam("minCost") Optional<Integer> minCost,
+//                           @RequestParam("maxCost") Optional<Integer> maxCost,
+//                           @RequestParam("page") Optional<Integer> page,
+//                           @RequestParam("size") Optional<Integer> size,
+//                           @RequestParam(name = "sortBy",defaultValue = "id", required = false) String sortBy,
+//                           @RequestParam(name = "sortDir", defaultValue = "asc", required = false) String sortDir){
+//        logger.info("Product list page");
+//        Specification<Product> spec = Specification.where(null);
+//        if(productFilter.isPresent() && !productFilter.get().isBlank()) {
+//            spec = spec.and(ProductSpecifications.productPrefix(productFilter.get()));
+//        }
+//        if(minCost.isPresent()) {
+//            spec = spec.and(ProductSpecifications.minCost(minCost.get()));
+//        }
+//
+//        if(maxCost.isPresent()) {
+//            spec = spec.and(ProductSpecifications.maxCost(maxCost.get()));
+//        }
+//
+//        Sort sort = sortDir.equalsIgnoreCase(Sort.Direction.ASC.name()) ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
+//
+//        model.addAttribute("reverseSortDir", sortDir.equals("asc") ? "desc" : "asc");
+//        model.addAttribute("boolSort" , sortDir.equals("desc"));
+//
+//        model.addAttribute("products", productRepository.findAll(spec,
+//                PageRequest.of(page.orElse(1) - 1, size.orElse(3), sort)));
+//        return "products";
+//    }
+
     @GetMapping
-    public String listPage(Model model,
-                           @RequestParam("productFilter") Optional<String> productFilter,
-                           @RequestParam("minCost") Optional<Integer> minCost,
-                           @RequestParam("maxCost") Optional<Integer> maxCost,
-                           @RequestParam("page") Optional<Integer> page,
-                           @RequestParam("size") Optional<Integer> size,
-                           @RequestParam(name = "sortBy",defaultValue = "id", required = false) String sortBy){
-        logger.info("Product list page");
-        Specification<Product> spec = Specification.where(null);
-        if(productFilter.isPresent() && !productFilter.get().isBlank()) {
-            spec = spec.and(ProductSpecifications.productPrefix(productFilter.get()));
-        }
-        if(minCost.isPresent()) {
-            spec = spec.and(ProductSpecifications.minCost(minCost.get()));
-        }
-
-        if(maxCost.isPresent()) {
-            spec = spec.and(ProductSpecifications.maxCost(maxCost.get()));
-        }
-
-        model.addAttribute("products", productRepository.findAll(spec,
-                PageRequest.of(page.orElse(1) - 1, size.orElse(3), Sort.by(sortBy))));
+    public String listPage(Model model, ProductListParams productListParams){
+        model.addAttribute("reverseSortDir", productListParams.getSortDir().equals("asc") ? "desc" : "asc");
+        model.addAttribute("products", productService.findWithFilter(productListParams));
         return "products";
     }
 
@@ -90,7 +97,7 @@ public class ProductController {
     @GetMapping("/{id}")
     public String editProduct(@PathVariable("id") Long id, Model model){
         logger.info("Edit product");
-        model.addAttribute("product",productRepository.findById(id).
+        model.addAttribute("product",productService.findById(id).
                 orElseThrow(() -> new NotFoundException("User not found")));
         return "product_form";
     }
@@ -98,7 +105,7 @@ public class ProductController {
     @DeleteMapping("/{id}")
     public String delete(@PathVariable("id") Long id){
         logger.info("Edit product");
-        productRepository.deleteById(id);
+        productService.deleteById(id);
         return "redirect:/product";
     }
 
@@ -108,7 +115,7 @@ public class ProductController {
         if(result.hasErrors()){
             return "product_form";
         }
-        productRepository.save(product);
+        productService.save(product);
         return "redirect:/product";
     }
 
