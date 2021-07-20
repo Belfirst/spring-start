@@ -1,6 +1,10 @@
 package ru.ash.entity;
 
+import ru.ash.persist.Product;
+
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "users")// указываем название таблицы
@@ -19,8 +23,16 @@ public class User {
     private String username;
     @Column
     private Integer age;
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Product> products = new ArrayList<>();
 
     public User() {
+    }
+
+    public User(String username, Integer age) {
+        this.id = null;
+        this.username = username;
+        this.age = age;
     }
 
     public User(Long id, String username, Integer age) {
@@ -51,6 +63,19 @@ public class User {
 
     public void setAge(Integer age) {
         this.age = age;
+    }
+
+    public List<Product> getProducts() {
+        return products;
+    }
+
+    public void setProducts(List<Product> products) {
+        this.products = products;
+    }
+
+    public void addProduct(Product product){
+        product.setUser(this);
+        products.add(product);
     }
 
     @Override

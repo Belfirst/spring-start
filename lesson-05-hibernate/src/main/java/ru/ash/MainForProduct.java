@@ -1,22 +1,27 @@
 package ru.ash;
 
-import ru.ash.persist.ProductDao;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
 public class MainForProduct {
     public static void main(String[] args) {
-        ProductDao productDao = new ProductDao();
-//        productDao.insert(new Product("Oranges", 160));
-//        productDao.insert(new Product("Cherry", 100));
-//        productDao.insert(new Product("Blueberry", 200));
-//        productDao.insert(new Product("Watermelons", 150));
-//        productDao.insert(new Product("Peaches", 120));
-//
-//        System.out.println(productDao.findAll());
-//
-//        productDao.saveOrUpdate(new Product(1L,"Oranges",50));
 
-//        productDao.delete(1L);
-        System.out.println(productDao.findAll());
+        ApplicationContext context = new AnnotationConfigApplicationContext(AppConfig.class);
+        Service service = context.getBean("service", Service.class);
+        System.out.println(service.getProductsForUser(1L));
+//        service.getListUser(4L);
+
+//        User user1 = new User("Phil", 30);
+//        user1.addProduct(new Product("Oranges", 160, user1));
+//        user1.addProduct(new Product("Cherry", 100,user1));
+//        user1.addProduct(new Product("Blueberry", 200, user1));
+//        service.insertUser(user1);
+//
+//        User user2 = new User("Phil", 30);
+//        user2.addProduct(new Product("Watermelons", 150, user2));
+//        user2.addProduct(new Product("Peaches", 120, user2));
+//        service.insertUser(user2);
+
 
 
     }
