@@ -30,7 +30,7 @@ public class ProductResource {
 
     @PostMapping(produces = "application/json")
     public Product create(@RequestBody Product product){
-        if(product.getId() != null){
+        if(product.getId() != -1 || product.getId() != null){
             throw new BadRequestException("User Id should be null");
         }
         productService.save(product);
@@ -40,7 +40,7 @@ public class ProductResource {
     @PutMapping(produces = "application/json")
     public void update(@RequestBody Product product){
         if(product.getId() == null){
-            throw new BadRequestException("User Id should be null");
+            throw new BadRequestException("User Id is not should be null");
         }
         productService.save(product);
     }
