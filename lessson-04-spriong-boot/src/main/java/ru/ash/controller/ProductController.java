@@ -10,10 +10,9 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 import ru.ash.persist.Product;
-import ru.ash.persist.ProductRepository;
+import ru.ash.service.ProductService;
 
 import javax.validation.Valid;
-import java.util.Optional;
 
 @Controller
 @RequestMapping("/product")
@@ -21,17 +20,70 @@ public class ProductController {
 
     private static final Logger logger = LoggerFactory.getLogger(ProductController.class);
 
-    private final ProductRepository productRepository;
+    private final ProductService productService;
 
     @Autowired
-    public ProductController(ProductRepository productRepository) {
-        this.productRepository = productRepository;
+    public ProductController(ProductService productService) {
+        this.productService = productService;
     }
 
+    // Способ с использованием методов spring date
+//    @GetMapping
+//    public String listPage(Model model,
+//                           @RequestParam("minCost") Optional<Integer> minCost,
+//                           @RequestParam("maxCost") Optional<Integer> maxCost){
+//        logger.info("Product list page");
+//        List<Product> products;
+//        if (maxCost.isPresent() && minCost.isPresent())
+//            products = productRepository.findProductsByCostAfterAndCostBefore(minCost.get(),maxCost.get());
+//        else if(maxCost.isPresent())
+//            products = productRepository.findProductsByCostBefore(maxCost.get());
+//        else if(minCost.isPresent())
+//            products = productRepository.findProductsByCostAfter(minCost.get());
+//        else {
+//            products = productRepository.findAll();
+//        }
+//        model.addAttribute("products", products);
+//        return "products";
+//    }
+
+        // способ с использование критерий
+//    @GetMapping
+//    public String listPage(Model model,
+//                           @RequestParam("productFilter") Optional<String> productFilter,
+//                           @RequestParam("minCost") Optional<Integer> minCost,
+//                           @RequestParam("maxCost") Optional<Integer> maxCost,
+//                           @RequestParam("page") Optional<Integer> page,
+//                           @RequestParam("size") Optional<Integer> size,
+//                           @RequestParam(name = "sortBy",defaultValue = "id", required = false) String sortBy,
+//                           @RequestParam(name = "sortDir", defaultValue = "asc", required = false) String sortDir){
+//        logger.info("Product list page");
+//        Specification<Product> spec = Specification.where(null);
+//        if(productFilter.isPresent() && !productFilter.get().isBlank()) {
+//            spec = spec.and(ProductSpecifications.productPrefix(productFilter.get()));
+//        }
+//        if(minCost.isPresent()) {
+//            spec = spec.and(ProductSpecifications.minCost(minCost.get()));
+//        }
+//
+//        if(maxCost.isPresent()) {
+//            spec = spec.and(ProductSpecifications.maxCost(maxCost.get()));
+//        }
+//
+//        Sort sort = sortDir.equalsIgnoreCase(Sort.Direction.ASC.name()) ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
+//
+//        model.addAttribute("reverseSortDir", sortDir.equals("asc") ? "desc" : "asc");
+//        model.addAttribute("boolSort" , sortDir.equals("desc"));
+//
+//        model.addAttribute("products", productRepository.findAll(spec,
+//                PageRequest.of(page.orElse(1) - 1, size.orElse(3), sort)));
+//        return "products";
+//    }
+
     @GetMapping
-    public String listPage(Model model){
-        logger.info("Product list page");
-        model.addAttribute("products", productRepository.findAll());
+    public String listPage(Model model, ProductListParams productListParams){
+        model.addAttribute("reverseSortDir", productListParams.getSortDir().equals("asc") ? "desc" : "asc");
+        model.addAttribute("products", productService.findWithFilter(productListParams));
         return "products";
     }
 
@@ -45,15 +97,15 @@ public class ProductController {
     @GetMapping("/{id}")
     public String editProduct(@PathVariable("id") Long id, Model model){
         logger.info("Edit product");
-        model.addAttribute("product",productRepository.findById(id).
+        model.addAttribute("product",productService.findById(id).
                 orElseThrow(() -> new NotFoundException("User not found")));
         return "product_form";
     }
 
-    @GetMapping("/{id}/delete")
+    @DeleteMapping("/{id}")
     public String delete(@PathVariable("id") Long id){
         logger.info("Edit product");
-        productRepository.delete(id);
+        productService.deleteById(id);
         return "redirect:/product";
     }
 
@@ -63,7 +115,7 @@ public class ProductController {
         if(result.hasErrors()){
             return "product_form";
         }
-        productRepository.save(product);
+        productService.save(product);
         return "redirect:/product";
     }
 
