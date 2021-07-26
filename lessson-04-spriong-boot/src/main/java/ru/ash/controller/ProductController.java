@@ -82,6 +82,7 @@ public class ProductController {
 
     @GetMapping
     public String listPage(Model model, ProductListParams productListParams){
+        logger.info("User list page requested");
         model.addAttribute("reverseSortDir", productListParams.getSortDir().equals("asc") ? "desc" : "asc");
         model.addAttribute("products", productService.findWithFilter(productListParams));
         return "products";

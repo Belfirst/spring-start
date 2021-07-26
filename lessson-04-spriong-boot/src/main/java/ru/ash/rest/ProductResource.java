@@ -31,10 +31,10 @@ public class ProductResource {
     @PostMapping(produces = "application/json")
     public Product create(@RequestBody Product product){
         if(product.getId() != -1 || product.getId() != null){
-            throw new BadRequestException("User Id should be null");
+            productService.save(product);
+            return product;
         }
-        productService.save(product);
-        return product;
+        throw new BadRequestException("User Id should be null");
     }
 
     @PutMapping(produces = "application/json")
