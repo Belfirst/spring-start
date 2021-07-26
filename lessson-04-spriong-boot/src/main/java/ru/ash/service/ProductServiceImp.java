@@ -44,10 +44,15 @@ public class ProductServiceImp implements ProductService{
             spec = spec.and(ProductSpecifications.maxCost(productListParams.getMaxCost()));
         }
 
-        Sort sort = productListParams.getSortDir().equalsIgnoreCase(Sort.Direction.ASC.name()) ?
-                Sort.by(productListParams.getSortBy()).ascending() :
-                Sort.by(productListParams.getSortBy()).descending();
+        Sort sort;
 
+        if(!productListParams.getSortDir().isBlank()) {
+            sort = productListParams.getSortDir().equalsIgnoreCase(Sort.Direction.ASC.name()) ?
+                    Sort.by(productListParams.getSortBy()).ascending() :
+                    Sort.by(productListParams.getSortBy()).descending();
+        } else {
+            sort = Sort.by("id").ascending();
+        }
         return productRepository.findAll(spec,
                 PageRequest.of(Optional.ofNullable(productListParams.getPage()).orElse(1) - 1,
                         Optional.ofNullable(productListParams.getSize()).orElse(3),
