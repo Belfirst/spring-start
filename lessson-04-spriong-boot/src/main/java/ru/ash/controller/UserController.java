@@ -9,6 +9,7 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
+import ru.ash.service.RoleService;
 import ru.ash.service.UserService;
 
 import javax.validation.Valid;
@@ -20,9 +21,12 @@ public class UserController {
 
     private final UserService userService;
 
+    private final RoleService roleService;
+
     @Autowired
-    public UserController(UserService userService) {
+    public UserController(UserService userService, RoleService roleService) {
         this.userService = userService;
+        this.roleService = roleService;
     }
 
     @GetMapping
@@ -38,6 +42,7 @@ public class UserController {
     public String newUserForm(Model model) {
         logger.info("New user page requested");
         model.addAttribute("user", new UserDto());
+        model.addAttribute("roles", roleService.findAll());
         return "user_form";
     }
 
@@ -47,18 +52,21 @@ public class UserController {
 
         model.addAttribute("user", userService.findById(id)
                 .orElseThrow(() -> new NotFoundException("User not found")));
+        model.addAttribute("roles", roleService.findAll());
         return "user_form";
     }
 
     @PostMapping
-    public String update(@Valid @ModelAttribute("user") UserDto user, BindingResult result) {
+    public String update(@Valid @ModelAttribute("user") UserDto user, BindingResult result, Model model) {
         logger.info("Saving user");
 
         if (result.hasErrors()) {
+            model.addAttribute("roles", roleService.findAll());
             return "user_form";
         }
 
         if (!user.getPassword().equals(user.getMatchingPassword())) {
+            model.addAttribute("roles", roleService.findAll());
             result.rejectValue("password", "", "Passwords are not correct");
             return "user_form";
         }
@@ -75,7 +83,6 @@ public class UserController {
         return "redirect:/user";
     }
 
-    //@ResponseStatus(HttpStatus.NOT_FOUND)
     @ExceptionHandler
     public ModelAndView notFoundExceptionHandler(NotFoundException ex) {
         ModelAndView modelAndView = new ModelAndView("not_found");

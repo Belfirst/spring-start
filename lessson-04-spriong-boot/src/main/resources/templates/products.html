@@ -1,5 +1,6 @@
 <!doctype html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 
 <head th:replace="fragments/header :: add_header"></head>
 
@@ -11,7 +12,7 @@
 <div class="container">
     <div class="row py-2">
         <div class="col-12">
-            <a class="btn btn-primary" th:href="@{/product/new}">Add Product</a>
+            <a sec:authorize="hasRole('SUPER_ADMIN')" class="btn btn-primary" th:href="@{/product/new}">Add Product</a>
         </div>
 
         <div class="col - 12 mt-3">
@@ -42,7 +43,8 @@
                     <th scope="col" th:replace="fragments/sort_header :: sort_header ('Id', 'id', ${reverseSortDir})"></th>
                     <th scope="col" th:replace="fragments/sort_header :: sort_header ('Title', 'title', ${reverseSortDir})"></th>
                     <th scope="col" th:replace="fragments/sort_header :: sort_header ('Cost', 'cost', ${reverseSortDir})"></th>
-                    <th scope="col">Actions</th>
+<!--                    <th:block sec:authorize="hasRole('SUPER_ADMIN')"><th scope="col">Actions</th></th:block>-->
+                    <th sec:authorize="hasRole('SUPER_ADMIN')" scope="col">Actions</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -51,7 +53,7 @@
                     <td th:text="${product.title}">Title</td>
                     <td th:text="${product.cost}">Cost</td>
 
-                    <td>
+                    <td sec:authorize="hasRole('SUPER_ADMIN')">
                         <a class="btn btn-success" th:href="@{/product/{id}(id = ${product.id})}"><i class="fas fa-edit"></i></a>
                         <form class="d-inline" th:method="delete" th:action="@{/product/{id}(id = ${product.id})}">
                             <button type="submit" class="btn btn-danger"><i class="far fa-trash-alt"></i></button>
